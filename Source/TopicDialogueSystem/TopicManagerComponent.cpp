@@ -41,3 +41,8 @@ void UTopicManagerComponent::UnlockDialogueTopic(FName TopicName)
 	}
 }
 
+bool UTopicManagerComponent::KnowsSpeaker(FName SpeakerID)
+{
+	return KnownSpeakers.Contains(SpeakerID);
+}
+

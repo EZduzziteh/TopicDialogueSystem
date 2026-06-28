@@ -4,90 +4,8 @@
 
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
+#include "TopicDialogueSpeakerDataAsset.h"
 #include "TopicDialogueComponent.generated.h"
-
-//forward declarations
-class UDialogueAction;
-
-
-USTRUCT(BlueprintType)
-struct FDialogueActionData
-{
-	GENERATED_BODY()
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	TArray<FName> TopicsToUnlock;
-
-	//UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	//TArray<TObjectPtr<UItemDefinition>> ItemsToGive;
-
-	//UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	//TArray<TObjectPtr<UItemDefinition>> ItemsToRemove;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	bool bLearnSpeakerName = false;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	bool bEndDialogue = false;
-};
-
-
-
-/*
-----------------: DialogueLineData--------------------
-*/
-
-
-
-
-USTRUCT(BlueprintType)
-struct FDialogueLineData {
-	GENERATED_BODY()
-public:
-	UPROPERTY(BlueprintReadWrite, EditAnywhere)
-	FText Text;
-	UPROPERTY(BlueprintReadWrite, EditAnywhere)
-	TSoftClassPtr<USoundBase> Sound;
-	UPROPERTY(BlueprintReadWrite, EditAnywhere)
-	FDialogueActionData DialogueActionData;
-
-	
-	
-};
-/*
-----------------: TopicData--------------------
-*/
-USTRUCT(BlueprintType)
-struct FTopicData : public FTableRowBase{
-
-	GENERATED_BODY()
-public:
-
-	UPROPERTY(BlueprintReadWrite, EditAnywhere)
-	FName TopicID;
-	UPROPERTY(BlueprintReadWrite, EditAnywhere)
-	FText TopicName;
-
-	UPROPERTY(BlueprintReadWrite, EditAnywhere)
-	TArray<FDialogueLineData> DialogueLines;
-};
-
-/*
-----------------: RumourData--------------------
-*/
-USTRUCT(BlueprintType)
-struct FRumourData : public FTableRowBase {
-
-	GENERATED_BODY()
-public:
-
-	UPROPERTY(BlueprintReadWrite, EditAnywhere)
-	FName RumourID;
-
-	UPROPERTY(BlueprintReadWrite, EditAnywhere)
-	TArray<FDialogueLineData> DialogueLines;
-};
-
 
 
 
@@ -102,6 +20,11 @@ public:
 	// Sets default values for this component's properties
 	UTopicDialogueComponent();
 
+
+	UFUNCTION(BlueprintCallable)
+	FString GetCurrentLocationName();
+
+
 protected:
 	// Called when the game starts
 	virtual void BeginPlay() override;
@@ -113,18 +36,28 @@ public:
 	UFUNCTION(BlueprintCallable)
 	TArray<FName> GetKnownTopics();
 
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (RowType = "TopicData"))
-	FName DialogueSpeaker_ID;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (RowType = "TopicData"))
-	FText DialogueSpeaker_Name;
-
-
 	UFUNCTION(BlueprintCallable)
 	FTopicData GetTopicData(FName TopicName);
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta=(RowType="TopicData"))
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	UTopicDialogueSpeakerDataAsset* SpeakerData;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (RowType = "TopicData"))
 	FDataTableRowHandle Topics;
-		
+
+	/*This is just an example - maybe you would want to return current level, or current cell, or have some more dynamic system for telling where the npc is located*/
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	FText CurrentLocationName;
+
+	
+
+	UFUNCTION(BlueprintCallable)
+	FDialogueLineData GetGreetLineData(bool knowsSpeaker);
+
+	UFUNCTION(BlueprintCallable)
+	FDialogueLineData GetFirstLineData(bool knowsSpeaker);
+
+	UFUNCTION(BlueprintCallable)
+	FDialogueLineData GetGoodbyeLineData();
+
 };

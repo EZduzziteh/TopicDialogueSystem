@@ -13,14 +13,32 @@ UTopicDialogueComponent::UTopicDialogueComponent()
 	// ...
 }
 
+FString UTopicDialogueComponent::GetCurrentLocationName()
+{
+	/*Done this way so that you could localize the name, but return it as a string to be used for replacement*/
+	
+	return CurrentLocationName.ToString();
+}
+
 
 // Called when the game starts
 void UTopicDialogueComponent::BeginPlay()
 {
 	Super::BeginPlay();
 
-	// ...
-	
+	if (SpeakerData != nullptr) {
+
+		if (SpeakerData->TopicDataTable != NULL) {
+			Topics.DataTable = SpeakerData->TopicDataTable;
+		}
+		else {
+
+			GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Red, TEXT("Error: Topic Data Table is not populated on Speaker Data (DataAsset)"));
+		}
+	}
+	else {
+		GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Red, TEXT("Error: Speaker Data (DataAsset) is not populated on Speaker"));
+	}
 }
 
 
@@ -48,4 +66,32 @@ FTopicData UTopicDialogueComponent::GetTopicData(FName TopicName)
 
 	return FTopicData();
 }
+
+FDialogueLineData UTopicDialogueComponent::GetGreetLineData(bool knowsSpeaker)
+{
+	if (knowsSpeaker) {
+
+		return SpeakerData->Greet_Met;
+	}
+	
+	return SpeakerData->Greet_Unmet;
+}
+
+FDialogueLineData UTopicDialogueComponent::GetFirstLineData(bool knowsSpeaker)
+{
+	if (knowsSpeaker) {
+
+		return SpeakerData->First_Met;
+	}
+
+	return SpeakerData->First_Unmet;
+}
+
+
+FDialogueLineData UTopicDialogueComponent::GetGoodbyeLineData()
+{
+
+	return SpeakerData->Goodbye;
+}
+
 

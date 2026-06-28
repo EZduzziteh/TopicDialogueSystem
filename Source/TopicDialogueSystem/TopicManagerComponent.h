@@ -40,5 +40,8 @@ public:
 
 	UPROPERTY(BlueprintAssignable, BlueprintCallable, BlueprintReadWrite)
 	FOnTopicLearned OnTopicLearned;
+
+	UFUNCTION(BlueprintCallable) 
+	bool KnowsSpeaker(FName SpeakerID);
 		
 };
