@@ -18,7 +18,7 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnTopicDialogueFinished);
 
 
 
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnTopicDialogueLineWasExecuted, UTopicDialogueComponent*, TopicDialogueComponent, FDialogueLineData, DialogueLineData);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_ThreeParams(FOnTopicDialogueLineWasExecuted, UTopicDialogueComponent*, TopicDialogueComponent, FDialogueLineData, DialogueLineData, int, LineIndex);
 
 /**
  * 
@@ -31,12 +31,17 @@ class TOPICDIALOGUESYSTEM_API UTopicDialogueSubsystem : public UGameInstanceSubs
 
 private:
 
-	TArray<FDialogueLineData> LinesToExecute;
+	TArray<FDialogueLineData> CurrentLines;
+	int32 CurrentLineIndex = INDEX_NONE;
+	
 
-	int CurrentLineIndex = 0;
 
 public:
+	UPROPERTY(BlueprintReadOnly)
+	UTopicManagerComponent* CurrentTopicManager;
 
+	UPROPERTY(BlueprintReadOnly)
+	UTopicDialogueComponent* CurrentDialogue;
 
 	UPROPERTY(BlueprintAssignable, BlueprintCallable, Category = "_TopicDialogue")
 	FOnTopicDialogueFinished OnTopicDialogueFinished;
@@ -54,16 +59,18 @@ public:
 	UPROPERTY(BlueprintAssignable, BlueprintCallable, Category = "_TopicDialogue")
 	FOnTopicDialogueLineWasExecuted OnTopicDialogueLineWasExecuted;
 
+	UFUNCTION(BlueprintCallable)
+	void ExecuteDialogue(const TArray<FDialogueLineData>& Lines, UTopicManagerComponent* TopicManager, UTopicDialogueComponent* TopicDialogue);
+	void ExecuteCurrentLine();
 
 	UFUNCTION(BlueprintCallable)
-	void ExecuteLine(FDialogueLineData Line, UTopicManagerComponent* TopicManager, UTopicDialogueComponent* TopicDialogue);
+	void NotifyCurrentLineFinished(int targetLineIndex);
 
-	UFUNCTION(BlueprintCallable)
 	void ExecuteAction(const FDialogueActionData& Action, UTopicManagerComponent* TopicManager, UTopicDialogueComponent* TopicDialogue);
 	UFUNCTION(BlueprintCallable)
 	FText TranslateSymbols(const FText& InputText, UTopicDialogueComponent* TopicDialogue);
 	UFUNCTION(BlueprintCallable)
 	FString GetPlayerName();
-	
+		
 
 };

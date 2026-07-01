@@ -3,32 +3,47 @@
 
 #include "TopicDialogueSubsystem.h"
 
-/*Executes Lines, with delays and awaits if required*/
-/*
-void UTopicDialogueSubsystem::ExecuteLines(
-    TArray<FDialogueLineData*>Lines,
+
+void UTopicDialogueSubsystem::ExecuteDialogue(
+    const TArray<FDialogueLineData>& Lines,
     UTopicManagerComponent* TopicManager,
     UTopicDialogueComponent* TopicDialogue)
 {
-
-    LinesToExecute = Lines;
+    CurrentLines = Lines;
     CurrentLineIndex = 0;
-    OnTopicDialogueLinesFinishedExecute.Broadcast();
-}*/
-
-/*Executes a single dialogue line*/
-void UTopicDialogueSubsystem::ExecuteLine(
-    FDialogueLineData Line,
-    UTopicManagerComponent* TopicManager,
-    UTopicDialogueComponent* TopicDialogue)
-{
-   // LinesToExecute = ;
-    //CurrentLineIndex = 0;
-
-
-    OnTopicDialogueLineWasExecuted.Broadcast(TopicDialogue, Line);
-    OnTopicDialogueFinished.Broadcast();
+    CurrentTopicManager = TopicManager;
+    CurrentDialogue = TopicDialogue;
+    ExecuteCurrentLine();
 }
+
+void UTopicDialogueSubsystem::ExecuteCurrentLine()
+{
+    if (!CurrentLines.IsValidIndex(CurrentLineIndex))
+    {
+        OnTopicDialogueFinished.Broadcast();
+        return;
+    }
+
+    const FDialogueLineData& Line = CurrentLines[CurrentLineIndex];
+    
+    ExecuteAction(Line.DialogueActionData, CurrentTopicManager, CurrentDialogue);
+
+    OnTopicDialogueLineWasExecuted.Broadcast(CurrentDialogue, Line, CurrentLineIndex);
+    
+
+}
+
+void UTopicDialogueSubsystem::NotifyCurrentLineFinished(int targetLineIndex)
+{
+    if (CurrentLineIndex != targetLineIndex) {
+        //Some other event must have ended this line first, do nothing.
+        return;
+    }
+
+    CurrentLineIndex++;
+    ExecuteCurrentLine();
+}
+
 
 
 void UTopicDialogueSubsystem::ExecuteAction(

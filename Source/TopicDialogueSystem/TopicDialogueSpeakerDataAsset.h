@@ -61,9 +61,15 @@ public:
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	FText Text;
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
-	TSoftClassPtr<USoundBase> Sound;
+	USoundBase* Sound;
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	float DelayAfterLine;
+
+
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	FDialogueActionData DialogueActionData;
+
+
 
 };
 /*
